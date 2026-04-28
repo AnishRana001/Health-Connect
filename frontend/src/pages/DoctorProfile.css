@@ -1,0 +1,104 @@
+.doctor-profile-page {
+  padding-bottom: var(--space-2xl);
+}
+
+.profile-layout {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  align-items: flex-start;
+}
+
+@media (max-width: 768px) {
+  .profile-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.profile-details {
+  padding: var(--space-xl);
+}
+
+.profile-header h2 {
+  color: var(--primary-color);
+  margin-bottom: var(--space-sm);
+  font-size: 2.2rem;
+}
+
+.about-text {
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: var(--text-muted);
+}
+
+.profile-divider {
+  border: 0;
+  height: 1px;
+  background: rgba(0,0,0,0.05);
+  margin: var(--space-xl) 0;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-lg);
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.info-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-xs);
+}
+
+.info-value {
+  font-weight: 500;
+  font-size: 1.1rem;
+}
+
+.booking-section {
+  padding: var(--space-xl);
+  background: var(--surface-color);
+  position: sticky;
+  top: 100px;
+}
+
+.booking-title {
+  font-size: 1.5rem;
+  margin-bottom: var(--space-md);
+  padding-bottom: var(--space-sm);
+  border-bottom: 2px solid var(--surface-color-secondary);
+}
+
+.btn-full {
+  width: 100%;
+  padding: 0.8rem;
+  font-size: 1.1rem;
+  margin-top: var(--space-sm);
+}
+
+.booking-alert {
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.alert-error {
+  background: #fef2f2;
+  color: var(--danger-color);
+  border-left: 4px solid var(--danger-color);
+}
+
+.alert-success {
+  background: #dcfce7;
+  color: #166534;
+  border-left: 4px solid #166534;
+}

@@ -1,0 +1,122 @@
+.dashboard-page {
+  padding-bottom: var(--space-2xl);
+}
+
+.dashboard-header {
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  padding-bottom: var(--space-md);
+}
+
+.appointments-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--space-lg);
+}
+
+.appointment-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.apt-body {
+  padding: var(--space-lg);
+}
+
+.apt-body h4 {
+  color: var(--primary-color);
+  margin-bottom: var(--space-xs);
+}
+
+.apt-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: var(--space-sm);
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px dashed rgba(0,0,0,0.1);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.apt-actions {
+  background: var(--surface-color-secondary);
+  padding: var(--space-md) var(--space-lg);
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-sm);
+}
+
+/* Dashboard Forms (Doctor Profile) */
+.profile-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
+/* Medicine Calendar Styles */
+.medicine-calendar-container {
+  margin-bottom: 2rem;
+}
+.cal-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+.cal-cell {
+  width: 14.28%;
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  position: relative;
+}
+.cal-cell:hover {
+  background-color: var(--bg-main);
+}
+.cal-cell.disabled {
+  color: var(--text-muted);
+  pointer-events: none;
+  opacity: 0.5;
+}
+.cal-cell.selected {
+  background-color: var(--primary);
+  color: white;
+  box-shadow: 0 4px 10px rgba(59, 130, 246, 0.4);
+}
+.cal-cell.has-meds {
+  font-weight: bold;
+}
+.cal-dot {
+  width: 6px;
+  height: 6px;
+  background-color: var(--primary);
+  border-radius: 50%;
+  position: absolute;
+  bottom: 10%;
+}
+.cal-cell.selected .cal-dot {
+  background-color: white;
+}
+.btn-icon {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  transition: background 0.2s;
+}
+.btn-icon:hover {
+  background: var(--bg-main);
+}

@@ -1,0 +1,51 @@
+.doctor-list-page {
+  padding-bottom: var(--space-2xl);
+}
+
+.doctors-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--space-xl);
+  margin-top: var(--space-lg);
+}
+
+.doctor-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.doctor-card-header {
+  padding: var(--space-lg);
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.doctor-name {
+  color: var(--primary-color);
+  margin-bottom: var(--space-xs);
+}
+
+.doctor-spec {
+  margin-bottom: 0;
+}
+
+.doctor-card-body {
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  flex: 1;
+}
+
+.doctor-info-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  color: var(--text-main);
+  font-size: 0.95rem;
+}
+
+.doctor-card-footer {
+  padding: var(--space-md) var(--space-lg);
+  background: var(--surface-color-secondary);
+  border-top: 1px solid rgba(0,0,0,0.05);
+}
