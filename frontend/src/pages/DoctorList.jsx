@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Star, Clock, DollarSign } from 'lucide-react';
+import { Star, Clock, DollarSign, ShieldCheck } from 'lucide-react';
 import api from '../utils/api';
 import './DoctorList.css';
 
@@ -40,7 +40,19 @@ const DoctorList = () => {
               <div className="doctor-card-header">
                 <div>
                   <h3 className="doctor-name">Dr. {doctor.userId?.name}</h3>
-                  <p className="doctor-spec badge badge-success">{doctor.specialization}</p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
+                    <p className="doctor-spec badge badge-success">{doctor.specialization}</p>
+                    {doctor.verified && (
+                      <span style={{
+                        display: 'inline-flex', alignItems: 'center', gap: '0.25rem',
+                        background: 'rgba(16,185,129,0.12)', color: '#10b981',
+                        fontSize: '0.72rem', fontWeight: 700, padding: '0.2rem 0.5rem',
+                        borderRadius: '999px', border: '1px solid rgba(16,185,129,0.3)',
+                      }}>
+                        <ShieldCheck size={11} /> Verified Doctor
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
               <div className="doctor-card-body">

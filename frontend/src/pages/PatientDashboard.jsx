@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react';
 import api from '../utils/api';
 import MedicineCalendar from '../components/MedicineCalendar';
+import { useToast } from '../context/ToastContext';
 import './Dashboard.css';
 
 const PatientDashboard = () => {
+  const toast = useToast();
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [cancellingId, setCancellingId] = useState(null);
 
   useEffect(() => {
     const fetchAppointments = async () => {
@@ -22,15 +25,17 @@ const PatientDashboard = () => {
   }, []);
 
   const handleCancel = async (id) => {
-    if(window.confirm('Are you sure you want to cancel this appointment?')){
-        try {
-            await api.put(`/appointments/${id}/status`, { status: 'cancelled' });
-            setAppointments(appointments.map(app => 
-                app._id === id ? { ...app, status: 'cancelled' } : app
-            ));
-        } catch (error) {
-            alert('Failed to update status');
-        }
+    if (cancellingId !== id) {
+      setCancellingId(id);
+      return; // show confirmation on second click
+    }
+    setCancellingId(null);
+    try {
+      await api.put(`/appointments/${id}/status`, { status: 'cancelled' });
+      setAppointments((prev) => prev.map((a) => (a._id === id ? { ...a, status: 'cancelled' } : a)));
+      toast.success('Appointment cancelled.');
+    } catch {
+      toast.error('Failed to cancel appointment. Please try again.');
     }
   };
 
@@ -42,7 +47,11 @@ const PatientDashboard = () => {
       </div>
 
       {loading ? (
-        <p>Loading appointments...</p>
+        <div style={{ padding: '2rem 0' }}>
+          {[1, 2, 3].map((i) => (
+            <div key={i} style={{ height: '120px', background: '#e2e8f0', borderRadius: '1rem', marginBottom: '1rem' }} className="skeleton" />
+          ))}
+        </div>
       ) : appointments.length === 0 ? (
         <div className="card text-center" style={{ padding: '3rem 1rem' }}>
           <h3>No Appointments Found</h3>
@@ -73,9 +82,17 @@ const PatientDashboard = () => {
                 )}
               </div>
               <div className="apt-actions">
-                {apt.status === 'pending' || apt.status === 'confirmed' ? (
-                  <button onClick={() => handleCancel(apt._id)} className="btn btn-outline btn-danger">Cancel</button>
-                ) : null}
+                {(apt.status === 'pending' || apt.status === 'confirmed') && (
+                  cancellingId === apt._id ? (
+                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                      <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>Confirm cancel?</span>
+                      <button onClick={() => handleCancel(apt._id)} className="btn btn-danger" style={{ padding: '0.3rem 0.65rem', fontSize: '0.8rem' }}>Yes</button>
+                      <button onClick={() => setCancellingId(null)} className="btn btn-outline" style={{ padding: '0.3rem 0.65rem', fontSize: '0.8rem' }}>No</button>
+                    </div>
+                  ) : (
+                    <button onClick={() => handleCancel(apt._id)} className="btn btn-outline btn-danger">Cancel Appointment</button>
+                  )
+                )}
               </div>
             </div>
           ))}

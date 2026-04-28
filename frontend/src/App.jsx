@@ -7,6 +7,8 @@ import DoctorList from './pages/DoctorList';
 import DoctorProfile from './pages/DoctorProfile';
 import PatientDashboard from './pages/PatientDashboard';
 import DoctorDashboard from './pages/DoctorDashboard';
+import AdminDashboard from './pages/AdminDashboard';
+import PendingVerification from './pages/PendingVerification';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -21,23 +23,43 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/doctors" element={<DoctorList />} />
             <Route path="/doctors/:id" element={<DoctorProfile />} />
-            
-            {/* Protected Routes */}
-            <Route 
-              path="/patient-dashboard" 
+
+            {/* Patient */}
+            <Route
+              path="/patient-dashboard"
               element={
                 <ProtectedRoute allowedRoles={['patient']}>
                   <PatientDashboard />
                 </ProtectedRoute>
-              } 
+              }
             />
-            <Route 
-              path="/doctor-dashboard" 
+
+            {/* Doctor */}
+            <Route
+              path="/doctor-dashboard"
               element={
                 <ProtectedRoute allowedRoles={['doctor']}>
                   <DoctorDashboard />
                 </ProtectedRoute>
-              } 
+              }
+            />
+            <Route
+              path="/pending-verification"
+              element={
+                <ProtectedRoute allowedRoles={['doctor']}>
+                  <PendingVerification />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Admin */}
+            <Route
+              path="/admin-dashboard"
+              element={
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <AdminDashboard />
+                </ProtectedRoute>
+              }
             />
           </Routes>
         </main>

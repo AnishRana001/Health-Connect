@@ -45,6 +45,14 @@
   /* Transitions */
   --transition-fast: 0.15s ease-in-out;
   --transition-normal: 0.3s ease-in-out;
+
+  /* Alias shorthands used in KYC / Admin feature code */
+  --primary:      #2563eb;
+  --border:       #e2e8f0;
+  --card-bg:      #ffffff;
+  --bg-main:      #f8fafc;
+  --text-primary: #0f172a;
+  --text-muted:   #64748b;
 }
 
 * {
@@ -255,3 +263,28 @@ h3 { font-size: 1.5rem; }
 .justify-center { justify-content: center; }
 .gap-1 { gap: var(--space-sm); }
 .gap-2 { gap: var(--space-md); }
+
+/* ── Skeleton Loading ──────────────────────────────────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: -600px 0; }
+  100% { background-position:  600px 0; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+  background-size: 600px 100%;
+  animation: shimmer 1.4s infinite linear;
+  border-radius: 0.5rem;
+}
+
+/* ── Button — outline danger ───────────────────────────────────────────── */
+.btn-outline.btn-danger {
+  background: transparent;
+  border: 2px solid var(--danger-color);
+  color: var(--danger-color);
+}
+.btn-outline.btn-danger:hover {
+  background: var(--danger-color);
+  color: white;
+}
+

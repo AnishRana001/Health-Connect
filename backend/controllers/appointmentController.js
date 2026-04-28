@@ -8,8 +8,19 @@ export const bookAppointment = async (req, res) => {
   try {
     const { doctorId, date, time, reason } = req.body;
 
+    // Ensure the doctor exists and is verified before allowing booking
+    const doctor = await Doctor.findById(doctorId);
+    if (!doctor) {
+      return res.status(404).json({ message: 'Doctor not found' });
+    }
+    if (doctor.verificationStatus !== 'approved') {
+      return res.status(403).json({
+        message: 'This doctor is not yet verified and cannot accept appointments.',
+      });
+    }
+
     const appointment = await Appointment.create({
-      userId: req.user._id, // User booking the appointment
+      userId: req.user._id,
       doctorId,
       date,
       time,
@@ -44,7 +55,6 @@ export const getUserAppointments = async (req, res) => {
 // @access  Private/Doctor
 export const getDoctorAppointments = async (req, res) => {
   try {
-    // Determine the doctor profile based on logged in user ID
     const doctor = await Doctor.findOne({ userId: req.user._id });
 
     if (!doctor) {
@@ -62,7 +72,6 @@ export const getDoctorAppointments = async (req, res) => {
 // @desc    Update appointment status
 // @route   PUT /api/appointments/:id/status
 // @access  Private
-// Allows Doctors to Confirm/Cancel/Complete, Patients to Cancel.
 export const updateAppointmentStatus = async (req, res) => {
   try {
     const { status } = req.body;
@@ -81,8 +90,8 @@ export const updateAppointmentStatus = async (req, res) => {
   }
 };
 
-// @desc    Get all appointments
-// @route   GET /api/appointments
+// @desc    Get all appointments (kept for backward compat — admin now uses /api/admin/appointments)
+// @route   GET /api/appointments/admin/all
 // @access  Private/Admin
 export const getAllAppointments = async (req, res) => {
   try {
@@ -96,7 +105,7 @@ export const getAllAppointments = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-}
+};
 
 // @desc    Update prescription and medicines for an appointment
 // @route   PUT /api/appointments/:id/prescription
@@ -112,10 +121,10 @@ export const addPrescription = async (req, res) => {
 
     appointment.prescription = prescription;
     appointment.medicines = medicines || [];
-    
-    // Automatically complete the appointment if a prescription is added/updated
+
+    // Automatically complete the appointment when a prescription is added
     if (appointment.status !== 'completed' && appointment.status !== 'cancelled') {
-        appointment.status = 'completed';
+      appointment.status = 'completed';
     }
 
     const updatedAppointment = await appointment.save();

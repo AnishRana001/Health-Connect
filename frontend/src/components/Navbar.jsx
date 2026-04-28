@@ -1,7 +1,13 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Stethoscope, LogOut, User as UserIcon } from 'lucide-react';
+import { Stethoscope, LogOut, User as UserIcon, ShieldCheck } from 'lucide-react';
 import './Navbar.css';
+
+const getDashboardPath = (role) => {
+  if (role === 'admin') return '/admin-dashboard';
+  if (role === 'doctor') return '/doctor-dashboard';
+  return '/patient-dashboard';
+};
 
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -29,12 +35,13 @@ const Navbar = () => {
             <>
               <li>
                 <span className="navbar-user">
-                  <UserIcon size={18} /> Hi, {user.name}
+                  {user.role === 'admin' ? <ShieldCheck size={18} /> : <UserIcon size={18} />}
+                  &nbsp;Hi, {user.name}
                 </span>
               </li>
               <li>
-                <Link to={user.role === 'doctor' ? '/doctor-dashboard' : '/patient-dashboard'} className="btn btn-outline">
-                  Dashboard
+                <Link to={getDashboardPath(user.role)} className="btn btn-outline">
+                  {user.role === 'admin' ? 'Admin Panel' : 'Dashboard'}
                 </Link>
               </li>
               <li>

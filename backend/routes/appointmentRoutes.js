@@ -22,7 +22,7 @@ router.route('/doctorappointments').get(protect, authorizeRoles('doctor'), getDo
 router.route('/:id/status').put(protect, authorizeRoles('doctor', 'patient', 'admin'), updateAppointmentStatus);
 router.route('/:id/prescription').put(protect, authorizeRoles('doctor'), addPrescription);
 
-// Admin routes
-router.route('/').get(protect, authorizeRoles('admin'), getAllAppointments);
+// Admin routes — fixed: was conflicting with POST '/'
+router.route('/admin/all').get(protect, authorizeRoles('admin'), getAllAppointments);
 
 export default router;

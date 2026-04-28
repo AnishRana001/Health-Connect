@@ -16,7 +16,9 @@ const Register = () => {
 
   useEffect(() => {
     if (user) {
-      navigate(user.role === 'doctor' ? '/doctor-dashboard' : '/patient-dashboard');
+      if (user.role === 'doctor') navigate('/pending-verification');
+      else if (user.role === 'admin') navigate('/admin-dashboard');
+      else navigate('/patient-dashboard');
     }
   }, [user, navigate]);
 

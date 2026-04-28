@@ -66,7 +66,19 @@ const DoctorProfile = () => {
         <div className="profile-details card">
           <div className="profile-header">
             <h2>Dr. {doctor.userId?.name}</h2>
-            <span className="badge badge-success">{doctor.specialization}</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', marginTop: '0.4rem' }}>
+              <span className="badge badge-success">{doctor.specialization}</span>
+              {doctor.verified && (
+                <span style={{
+                  display: 'inline-flex', alignItems: 'center', gap: '0.3rem',
+                  background: 'rgba(16,185,129,0.12)', color: '#10b981',
+                  fontSize: '0.78rem', fontWeight: 700, padding: '0.25rem 0.65rem',
+                  borderRadius: '999px', border: '1px solid rgba(16,185,129,0.35)',
+                }}>
+                  <ShieldCheck size={13} /> Verified Doctor
+                </span>
+              )}
+            </div>
           </div>
           <div className="profile-body mt-1">
             <p className="about-text">{doctor.about || 'No details provided by the doctor.'}</p>

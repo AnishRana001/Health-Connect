@@ -1,5 +1,11 @@
 import mongoose from 'mongoose';
 
+const documentSlot = {
+  url:          { type: String, default: '' },
+  publicId:     { type: String, default: '' },
+  originalName: { type: String, default: '' },
+};
+
 const doctorSchema = new mongoose.Schema(
   {
     userId: {
@@ -25,10 +31,40 @@ const doctorSchema = new mongoose.Schema(
     },
     availableTiming: {
       start: { type: String, required: true },
-      end: { type: String, required: true },
+      end:   { type: String, required: true },
     },
     about: {
       type: String,
+    },
+
+    // ── KYC / Verification ────────────────────────────────────────────────
+    verificationStatus: {
+      type: String,
+      enum: ['pending', 'approved', 'rejected'],
+      default: 'pending',
+    },
+    verified: {
+      type: Boolean,
+      default: false,
+    },
+    licenseNumber: {
+      type: String,
+      default: '',
+    },
+    hospitalAffiliation: {
+      type: String,
+      default: '',
+    },
+    verificationNote: {
+      type: String,
+      default: '',
+    },
+
+    // ── Cloudinary document uploads ───────────────────────────────────────
+    documents: {
+      licenseDocument: documentSlot,   // Medical License Certificate
+      medicalDegree:   documentSlot,   // Degree Certificate
+      governmentId:    documentSlot,   // Government-issued ID
     },
   },
   {
