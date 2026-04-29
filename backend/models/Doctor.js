@@ -33,6 +33,16 @@ const doctorSchema = new mongoose.Schema(
       start: { type: String, required: true },
       end:   { type: String, required: true },
     },
+    slotDuration: {
+      type: Number,
+      default: 30, // minutes per appointment slot
+      min: 10,
+      max: 120,
+    },
+    unavailableDates: {
+      type: [String], // YYYY-MM-DD strings for blocked / vacation dates
+      default: [],
+    },
     about: {
       type: String,
     },

@@ -88,7 +88,7 @@ const StatusPill = ({ status }) => {
 const EMPTY_PROFILE = {
   specialization: '', experience: '', consultationFee: '',
   availableDays: '', about: '', start: '09:00', end: '17:00',
-  licenseNumber: '', hospitalAffiliation: '',
+  licenseNumber: '', hospitalAffiliation: '', slotDuration: 30,
 };
 
 const DoctorDashboard = () => {
@@ -105,6 +105,9 @@ const DoctorDashboard = () => {
   const [profileSaving,      setProfileSaving]      = useState(false);
   const [kycUploading,       setKycUploading]       = useState(false);
   const [prescriptionForm,   setPrescriptionForm]   = useState(null);
+  const [unavailableDates,   setUnavailableDates]   = useState([]);
+  const [newBlockDate,       setNewBlockDate]       = useState('');
+  const [blockingDate,       setBlockingDate]       = useState(false);
 
   // ── Data fetching ───────────────────────────────────────────────────────────
 
@@ -133,7 +136,9 @@ const DoctorDashboard = () => {
             end:                doc.availableTiming?.end   || '17:00',
             licenseNumber:      doc.licenseNumber       || '',
             hospitalAffiliation: doc.hospitalAffiliation || '',
+            slotDuration:       doc.slotDuration        ?? 30,
           });
+          setUnavailableDates(doc.unavailableDates || []);
         }
       } catch {
         if (!cancelled) toast.error('Failed to load dashboard data. Please refresh.');
@@ -156,6 +161,7 @@ const DoctorDashboard = () => {
         ...profile,
         availableDays:  profile.availableDays.split(',').map((d) => d.trim()).filter(Boolean),
         availableTiming: { start: profile.start, end: profile.end },
+        slotDuration: Number(profile.slotDuration) || 30,
       };
       await api.post('/doctors/profile', payload);
       toast.success('Profile saved successfully!');
@@ -201,6 +207,34 @@ const DoctorDashboard = () => {
       toast.success(`Appointment ${status}.`);
     } catch (err) {
       toast.error(err.message || 'Failed to update appointment status.');
+    }
+  };
+
+  // ── Unavailable dates management ────────────────────────────────────
+
+  const handleBlockDate = async () => {
+    if (!newBlockDate) return toast.warning('Please select a date to block.');
+    if (unavailableDates.includes(newBlockDate)) return toast.warning('This date is already blocked.');
+    setBlockingDate(true);
+    try {
+      const res = await api.post('/availability/unavailable', { date: newBlockDate });
+      setUnavailableDates(res.data.unavailableDates);
+      setNewBlockDate('');
+      toast.success(`${newBlockDate} blocked successfully.`);
+    } catch (err) {
+      toast.error(err?.response?.data?.message || 'Failed to block date.');
+    } finally {
+      setBlockingDate(false);
+    }
+  };
+
+  const handleUnblockDate = async (date) => {
+    try {
+      const res = await api.delete(`/availability/unavailable/${date}`);
+      setUnavailableDates(res.data.unavailableDates);
+      toast.success(`${date} unblocked.`);
+    } catch (err) {
+      toast.error(err?.response?.data?.message || 'Failed to unblock date.');
     }
   };
 
@@ -285,6 +319,7 @@ const DoctorDashboard = () => {
                   { key: 'availableDays',      label: 'Available Days (comma sep)',type: 'text',  required: true,  placeholder: 'Mon, Tue, Wed' },
                   { key: 'start',              label: 'Start Time',              type: 'time',   required: true },
                   { key: 'end',                label: 'End Time',                type: 'time',   required: true },
+                  { key: 'slotDuration',       label: 'Slot Duration (min)',      type: 'number', required: true,  placeholder: 'e.g. 15, 30, 45, 60' },
                   { key: 'licenseNumber',      label: 'Medical License Number',  type: 'text',   required: false, placeholder: 'e.g., MCI-12345' },
                   { key: 'hospitalAffiliation',label: 'Hospital / Clinic',       type: 'text',   required: false, placeholder: 'e.g., City General Hospital' },
                 ].map(({ key, label, type, required, placeholder }) => (
@@ -306,6 +341,64 @@ const DoctorDashboard = () => {
                 {profileSaving ? 'Saving…' : 'Save Profile'}
               </button>
             </form>
+          </div>
+
+          {/* Unavailable Dates Panel */}
+          <div className="card" style={{ padding: '1.5rem' }}>
+            <h3>Unavailable Dates</h3>
+            <p className="text-muted" style={{ fontSize: '0.85rem', margin: '0.4rem 0 1rem' }}>
+              Block specific dates (vacations, holidays, days off). Patients won't be able to book on these days.
+            </p>
+
+            {/* Add new blocked date */}
+            <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center', marginBottom: '1.1rem' }}>
+              <input
+                type="date"
+                className="form-control"
+                value={newBlockDate}
+                min={new Date().toISOString().split('T')[0]}
+                onChange={(e) => setNewBlockDate(e.target.value)}
+                style={{ flex: 1 }}
+              />
+              <button
+                type="button"
+                className="btn btn-primary"
+                style={{ flexShrink: 0, padding: '0.6rem 1rem', fontSize: '0.88rem' }}
+                onClick={handleBlockDate}
+                disabled={blockingDate}
+              >
+                {blockingDate ? '…' : '🚫 Block Date'}
+              </button>
+            </div>
+
+            {/* List of blocked dates */}
+            {unavailableDates.length === 0 ? (
+              <p className="text-muted" style={{ fontSize: '0.85rem', textAlign: 'center', padding: '0.75rem 0' }}>
+                No dates blocked. You're available every working day.
+              </p>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', maxHeight: '220px', overflowY: 'auto' }}>
+                {[...unavailableDates].sort().map((date) => (
+                  <div key={date} style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    padding: '0.45rem 0.75rem',
+                    background: '#fff5f5',
+                    border: '1px solid #fca5a5',
+                    borderRadius: '0.5rem',
+                  }}>
+                    <span style={{ fontWeight: 600, fontSize: '0.88rem', color: '#dc2626' }}>📅 {date}</span>
+                    <button
+                      type="button"
+                      className="btn btn-outline"
+                      style={{ padding: '0.2rem 0.55rem', fontSize: '0.76rem', borderColor: '#dc2626', color: '#dc2626' }}
+                      onClick={() => handleUnblockDate(date)}
+                    >
+                      Unblock
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* KYC */}

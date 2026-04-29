@@ -46,20 +46,21 @@ export const manageDoctorProfile = async (req, res) => {
     const {
       specialization, experience, consultationFee,
       availableDays, availableTiming, about,
-      licenseNumber, hospitalAffiliation,
+      licenseNumber, hospitalAffiliation, slotDuration,
     } = req.body;
 
     let doctor = await Doctor.findOne({ userId: req.user._id });
 
     if (doctor) {
-      doctor.specialization    = specialization    ?? doctor.specialization;
-      doctor.experience        = experience        ?? doctor.experience;
-      doctor.consultationFee   = consultationFee   ?? doctor.consultationFee;
-      doctor.availableDays     = availableDays     ?? doctor.availableDays;
-      doctor.availableTiming   = availableTiming   ?? doctor.availableTiming;
-      doctor.about             = about             ?? doctor.about;
-      doctor.licenseNumber     = licenseNumber     ?? doctor.licenseNumber;
-      doctor.hospitalAffiliation = hospitalAffiliation ?? doctor.hospitalAffiliation;
+      doctor.specialization      = specialization      ?? doctor.specialization;
+      doctor.experience           = experience          ?? doctor.experience;
+      doctor.consultationFee      = consultationFee     ?? doctor.consultationFee;
+      doctor.availableDays        = availableDays       ?? doctor.availableDays;
+      doctor.availableTiming      = availableTiming     ?? doctor.availableTiming;
+      doctor.about                = about               ?? doctor.about;
+      doctor.licenseNumber        = licenseNumber       ?? doctor.licenseNumber;
+      doctor.hospitalAffiliation  = hospitalAffiliation ?? doctor.hospitalAffiliation;
+      if (slotDuration !== undefined) doctor.slotDuration = slotDuration;
 
       const updated = await doctor.save();
       res.json(updated);
@@ -72,8 +73,9 @@ export const manageDoctorProfile = async (req, res) => {
         availableDays,
         availableTiming,
         about,
-        licenseNumber:      licenseNumber      || '',
+        licenseNumber:       licenseNumber       || '',
         hospitalAffiliation: hospitalAffiliation || '',
+        slotDuration:        slotDuration        || 30,
       });
       res.status(201).json(doctor);
     }

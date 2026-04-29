@@ -39,11 +39,35 @@ const appointmentSchema = new mongoose.Schema(
       duration: { type: Number, required: true }, // number of days
       startDate: { type: String, required: true }, // YYYY-MM-DD
     }],
+
+    // ── Payment ──────────────────────────────────────────────────────────
+    paymentStatus: {
+      type: String,
+      enum: ['unpaid', 'paid', 'pay_at_clinic', 'failed'],
+      default: 'unpaid',
+    },
+    paymentMethod: {
+      type: String,
+      enum: ['upi', 'card', 'netbanking', 'cash', null],
+      default: null,
+    },
+    mockTransactionId: {
+      type: String,
+      default: null,
+    },
+    // Slot held for 15 min while patient completes payment; expires → auto-release
+    reservationExpiresAt: {
+      type: Date,
+      default: () => new Date(Date.now() + 15 * 60 * 1000), // 15 minutes from creation
+    },
   },
   {
     timestamps: true,
   }
 );
+
+// Index to efficiently find and clean up expired pending reservations
+appointmentSchema.index({ reservationExpiresAt: 1, paymentStatus: 1 });
 
 const Appointment = mongoose.model('Appointment', appointmentSchema);
 export default Appointment;

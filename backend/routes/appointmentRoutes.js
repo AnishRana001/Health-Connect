@@ -5,7 +5,9 @@ import {
   getDoctorAppointments,
   updateAppointmentStatus,
   getAllAppointments,
-  addPrescription
+  addPrescription,
+  confirmPayment,
+  adminReleaseExpired,
 } from '../controllers/appointmentController.js';
 import { protect, authorizeRoles } from '../middleware/authMiddleware.js';
 
@@ -22,7 +24,11 @@ router.route('/doctorappointments').get(protect, authorizeRoles('doctor'), getDo
 router.route('/:id/status').put(protect, authorizeRoles('doctor', 'patient', 'admin'), updateAppointmentStatus);
 router.route('/:id/prescription').put(protect, authorizeRoles('doctor'), addPrescription);
 
-// Admin routes — fixed: was conflicting with POST '/'
+// Payment confirmation (patient only)
+router.route('/:id/pay').put(protect, authorizeRoles('patient'), confirmPayment);
+
+// Admin routes
 router.route('/admin/all').get(protect, authorizeRoles('admin'), getAllAppointments);
+router.route('/admin/release-expired').post(protect, authorizeRoles('admin'), adminReleaseExpired);
 
 export default router;

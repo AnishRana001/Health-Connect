@@ -1,40 +1,79 @@
+/* ── Doctor Profile Page ─────────────────────────────────────────────── */
+
 .doctor-profile-page {
   padding-bottom: var(--space-2xl);
 }
 
 .profile-layout {
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: 5fr 4fr;
   align-items: flex-start;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   .profile-layout {
     grid-template-columns: 1fr;
   }
 }
 
+/* ── Doctor Info Card ──────────────────────────────────────────────── */
+
 .profile-details {
   padding: var(--space-xl);
 }
 
+.profile-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.doc-avatar {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2563eb, #0ea5e9);
+  color: white;
+  font-size: 1.8rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 14px rgba(37,99,235,0.32);
+}
+
 .profile-header h2 {
   color: var(--primary-color);
-  margin-bottom: var(--space-sm);
-  font-size: 2.2rem;
+  margin-bottom: 0.1rem;
+  font-size: 1.7rem;
+  line-height: 1.2;
+}
+
+.verified-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: rgba(16, 185, 129, 0.12);
+  color: #10b981;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid rgba(16, 185, 129, 0.35);
 }
 
 .about-text {
-  font-size: 1.05rem;
-  line-height: 1.7;
+  font-size: 1rem;
+  line-height: 1.75;
   color: var(--text-muted);
 }
 
 .profile-divider {
   border: 0;
   height: 1px;
-  background: rgba(0,0,0,0.05);
-  margin: var(--space-xl) 0;
+  background: rgba(0,0,0,0.06);
+  margin: var(--space-lg) 0;
 }
 
 .info-grid {
@@ -46,40 +85,67 @@
 .info-item {
   display: flex;
   flex-direction: column;
+  gap: 0.3rem;
 }
 
 .info-label {
-  font-size: 0.85rem;
+  font-size: 0.78rem;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: var(--space-xs);
+  letter-spacing: 0.06em;
+  display: flex;
+  align-items: center;
 }
 
 .info-value {
-  font-weight: 500;
-  font-size: 1.1rem;
+  font-weight: 600;
+  font-size: 1rem;
 }
+
+.slot-duration-pill {
+  margin-top: 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.85rem;
+  background: rgba(37,99,235,0.06);
+  border: 1px solid rgba(37,99,235,0.2);
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+/* ── Booking Card ───────────────────────────────────────────────────── */
 
 .booking-section {
   padding: var(--space-xl);
-  background: var(--surface-color);
   position: sticky;
   top: 100px;
 }
 
-.booking-title {
-  font-size: 1.5rem;
-  margin-bottom: var(--space-md);
-  padding-bottom: var(--space-sm);
+.booking-header {
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.9rem;
   border-bottom: 2px solid var(--surface-color-secondary);
+}
+
+.booking-title {
+  font-size: 1.35rem;
+  margin-bottom: 0.2rem;
+}
+
+.booking-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0;
 }
 
 .btn-full {
   width: 100%;
   padding: 0.8rem;
-  font-size: 1.1rem;
-  margin-top: var(--space-sm);
+  font-size: 1rem;
+  margin-top: 0.5rem;
 }
 
 .booking-alert {
@@ -89,6 +155,7 @@
   align-items: center;
   gap: var(--space-sm);
   margin-bottom: var(--space-md);
+  font-size: 0.9rem;
 }
 
 .alert-error {

@@ -9,6 +9,7 @@ import PatientDashboard from './pages/PatientDashboard';
 import DoctorDashboard from './pages/DoctorDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import PendingVerification from './pages/PendingVerification';
+import PaymentPage from './pages/PaymentPage';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -30,6 +31,14 @@ function App() {
               element={
                 <ProtectedRoute allowedRoles={['patient']}>
                   <PatientDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/payment/:appointmentId"
+              element={
+                <ProtectedRoute allowedRoles={['patient']}>
+                  <PaymentPage />
                 </ProtectedRoute>
               }
             />
