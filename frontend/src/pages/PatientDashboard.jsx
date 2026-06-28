@@ -5,27 +5,28 @@ import MedicineCalendar from '../components/MedicineCalendar';
 import { useToast } from '../context/ToastContext';
 import {
   CreditCard, Smartphone, Building2, Banknote,
-  Clock, CheckCircle2, AlertCircle, IndianRupee
+  Clock, CheckCircle2, AlertCircle, IndianRupee,
+  Calendar, FileText, Pill, X, CheckCircle, AlertTriangle,
 } from 'lucide-react';
 import './Dashboard.css';
 import './PaymentDashboard.css';
 
 /* ── Payment method label + icon ────────────────────────────── */
 const METHOD_LABELS = {
-  upi:        { label: 'UPI',          Icon: Smartphone },
-  card:       { label: 'Card',         Icon: CreditCard },
-  netbanking: { label: 'Net Banking',  Icon: Building2  },
-  cash:       { label: 'Cash at Clinic', Icon: Banknote },
+  upi:        { label: 'UPI',            Icon: Smartphone },
+  card:       { label: 'Card',           Icon: CreditCard },
+  netbanking: { label: 'Net Banking',    Icon: Building2  },
+  cash:       { label: 'Cash at Clinic', Icon: Banknote   },
 };
 
 const PaymentBadge = ({ apt }) => {
   const { paymentStatus, paymentMethod, mockTransactionId } = apt;
 
   const config = {
-    paid:          { label: 'Paid',            bg: '#dcfce7', color: '#166534', Icon: CheckCircle2 },
-    pay_at_clinic: { label: 'Pay at Clinic',   bg: '#fef9c3', color: '#854d0e', Icon: Banknote     },
-    unpaid:        { label: 'Unpaid',           bg: '#fee2e2', color: '#991b1b', Icon: AlertCircle  },
-    failed:        { label: 'Expired/Failed',   bg: '#f1f5f9', color: '#64748b', Icon: AlertCircle  },
+    paid:          { label: 'Paid',           bg: '#dcfce7', color: '#166534', Icon: CheckCircle2 },
+    pay_at_clinic: { label: 'Pay at Clinic',  bg: '#fef9c3', color: '#854d0e', Icon: Banknote     },
+    unpaid:        { label: 'Unpaid',         bg: '#fee2e2', color: '#991b1b', Icon: AlertCircle  },
+    failed:        { label: 'Expired/Failed', bg: '#f1f5f9', color: '#64748b', Icon: AlertCircle  },
   };
 
   const c = config[paymentStatus] || config.unpaid;
@@ -74,6 +75,35 @@ const ReservationCountdown = ({ expiresAt }) => {
       Slot reserved — complete payment in {m}:{s}
     </div>
   );
+};
+
+/* ── Skeleton Card ─────────────────────────────────────────────── */
+const SkeletonCard = () => (
+  <div className="appointment-card skeleton-card">
+    <div className="apt-card-top skeleton-top">
+      <div className="skeleton skeleton-avatar" />
+      <div className="skeleton-text-block">
+        <div className="skeleton skeleton-line" style={{ width: '60%', height: '14px' }} />
+        <div className="skeleton skeleton-line" style={{ width: '40%', height: '11px', marginTop: '6px' }} />
+      </div>
+      <div className="skeleton skeleton-badge" style={{ marginLeft: 'auto' }} />
+    </div>
+    <div className="apt-body skeleton-body">
+      <div className="skeleton skeleton-line" style={{ width: '55%', height: '12px' }} />
+      <div className="skeleton skeleton-line" style={{ width: '45%', height: '12px', marginTop: '8px' }} />
+      <div className="skeleton skeleton-line" style={{ width: '70%', height: '12px', marginTop: '8px' }} />
+    </div>
+  </div>
+);
+
+/* ── Status badge class helper ─────────────────────────────────── */
+const statusBadgeClass = (status) => {
+  switch (status) {
+    case 'confirmed': return 'badge badge-success';
+    case 'cancelled': return 'badge badge-danger';
+    case 'completed': return 'badge badge-success';
+    default:          return 'badge badge-pending';
+  }
 };
 
 /* ── Main Dashboard ──────────────────────────────────────────── */
@@ -128,85 +158,151 @@ const PatientDashboard = () => {
 
   return (
     <div className="dashboard-page container animate-fade-in">
+
+      {/* ── Header ──────────────────────────────────────────────── */}
       <div className="dashboard-header mt-2 mb-2">
-        <h2>My Appointments</h2>
-        <p className="text-muted">View and manage your scheduled consultations.</p>
+        <div className="dashboard-header-left">
+          <p className="dashboard-greeting">Good to see you 👋</p>
+          <h2 className="dashboard-title">My Appointments</h2>
+          <p className="dashboard-subtitle">View and manage your scheduled consultations.</p>
+        </div>
+        <button
+          className="btn btn-primary dashboard-book-btn"
+          onClick={() => navigate('/doctors')}
+        >
+          <Calendar size={16} />
+          Book New Appointment
+        </button>
       </div>
 
+      {/* ── Loading skeletons ──────────────────────────────────── */}
       {loading ? (
-        <div style={{ padding: '2rem 0' }}>
-          {[1, 2, 3].map((i) => (
-            <div key={i} style={{ height: '120px', background: '#e2e8f0', borderRadius: '1rem', marginBottom: '1rem' }} className="skeleton" />
-          ))}
+        <div className="appointments-grid">
+          {[1, 2, 3].map((i) => <SkeletonCard key={i} />)}
         </div>
       ) : appointments.length === 0 ? (
-        <div className="card text-center" style={{ padding: '3rem 1rem' }}>
-          <h3>No Appointments Found</h3>
-          <p className="text-muted mb-1">You haven't booked any appointments yet.</p>
-          <a href="/doctors" className="btn btn-primary">Book Now</a>
+
+        /* ── Empty state ──────────────────────────────────────── */
+        <div className="empty-state">
+          <div className="empty-state-icon">📅</div>
+          <h3 className="empty-state-heading">No appointments yet</h3>
+          <p className="empty-state-sub">
+            You haven&apos;t booked any consultations. Find a doctor and schedule your first visit.
+          </p>
+          <button className="btn btn-primary" onClick={() => navigate('/doctors')}>
+            <Calendar size={15} style={{ marginRight: '0.4rem' }} />
+            Book Now
+          </button>
         </div>
+
       ) : (
         <>
           <MedicineCalendar appointments={appointments} />
 
-          <h3 className="mt-2 mb-1" style={{ borderBottom: '1px solid var(--border)', paddingBottom: '0.5rem' }}>Appointment History</h3>
+          <div className="section-divider">
+            <span className="section-divider-label">Appointment History</span>
+          </div>
+
           <div className="appointments-grid">
-            {appointments.map((apt) => (
-              <div key={apt._id} className="appointment-card card">
-                <div className="apt-body">
-                  <h4>Dr. {apt.doctorId?.userId?.name || 'Unknown'}</h4>
-                  <p className="text-muted">{apt.doctorId?.specialization}</p>
-                  <div className="apt-details">
-                    <span className={`badge badge-${
-                      apt.status === 'confirmed' ? 'success' :
-                      apt.status === 'cancelled' ? 'danger'  :
-                      apt.status === 'completed' ? 'success' : 'pending'
-                    }`}>
+            {appointments.map((apt) => {
+              const docName = apt.doctorId?.userId?.name || 'Unknown';
+              const initial = docName.charAt(0).toUpperCase();
+              const spec    = apt.doctorId?.specialization || '';
+
+              return (
+                <div key={apt._id} className="appointment-card">
+
+                  {/* ── Card Top ─────────────────────────────── */}
+                  <div className="apt-card-top">
+                    <div className="apt-doc-avatar">{initial}</div>
+                    <div className="apt-doc-info">
+                      <div className="apt-doc-name">Dr. {docName}</div>
+                      <div className="apt-doc-spec">{spec}</div>
+                    </div>
+                    <span className={statusBadgeClass(apt.status)} style={{ marginLeft: 'auto', flexShrink: 0 }}>
                       {apt.status}
                     </span>
-                    <span>{apt.date} at {apt.time}</span>
                   </div>
 
-                  {/* Payment badge row */}
-                  <PaymentBadge apt={apt} />
-
-                  {/* Pending payment countdown + resume button */}
-                  {apt.paymentStatus === 'unpaid' && apt.status === 'pending' && (
-                    <>
-                      <ReservationCountdown expiresAt={apt.reservationExpiresAt} />
-                      <button
-                        className="btn btn-primary"
-                        style={{ marginTop: '0.6rem', padding: '0.4rem 0.9rem', fontSize: '0.83rem' }}
-                        onClick={() => handleCompletePayment(apt)}
-                      >
-                        Complete Payment
-                      </button>
-                    </>
-                  )}
-
-                  <p className="mt-1"><strong>Reason:</strong> {apt.reason}</p>
-                  {apt.prescription && (
-                    <div className="mt-1" style={{ background: 'var(--bg-main)', padding: '0.8rem', borderRadius: '0.4rem', borderLeft: '3px solid var(--primary)' }}>
-                      <p style={{ margin: 0, fontSize: '0.9rem', fontWeight: 600 }}>Prescription Notes:</p>
-                      <p style={{ margin: '0.2rem 0 0', fontSize: '0.9rem', whiteSpace: 'pre-line' }}>{apt.prescription}</p>
+                  {/* ── Card Body ────────────────────────────── */}
+                  <div className="apt-body">
+                    <div className="apt-meta-row">
+                      <Calendar size={14} className="apt-meta-icon" />
+                      {apt.date}
                     </div>
-                  )}
-                </div>
-                <div className="apt-actions">
-                  {(apt.status === 'pending' || apt.status === 'confirmed') && apt.paymentStatus !== 'unpaid' && (
-                    cancellingId === apt._id ? (
-                      <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                        <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>Confirm cancel?</span>
-                        <button onClick={() => handleCancel(apt._id)} className="btn btn-danger" style={{ padding: '0.3rem 0.65rem', fontSize: '0.8rem' }}>Yes</button>
-                        <button onClick={() => setCancellingId(null)} className="btn btn-outline" style={{ padding: '0.3rem 0.65rem', fontSize: '0.8rem' }}>No</button>
+                    <div className="apt-meta-row">
+                      <Clock size={14} className="apt-meta-icon" />
+                      {apt.time}
+                    </div>
+
+                    <PaymentBadge apt={apt} />
+
+                    {apt.paymentStatus === 'unpaid' && apt.status === 'pending' && (
+                      <>
+                        <ReservationCountdown expiresAt={apt.reservationExpiresAt} />
+                        <button
+                          className="btn btn-primary complete-payment-btn"
+                          onClick={() => handleCompletePayment(apt)}
+                        >
+                          <IndianRupee size={13} />
+                          Complete Payment
+                        </button>
+                      </>
+                    )}
+
+                    <div className="apt-reason">
+                      <FileText size={13} className="apt-meta-icon" />
+                      <span><strong>Reason:</strong> {apt.reason}</span>
+                    </div>
+
+                    {apt.prescription && (
+                      <div className="apt-prescription">
+                        <div className="apt-prescription-header">
+                          <Pill size={13} />
+                          Prescription Notes
+                        </div>
+                        <p className="apt-prescription-text">{apt.prescription}</p>
                       </div>
-                    ) : (
-                      <button onClick={() => handleCancel(apt._id)} className="btn btn-outline btn-danger">Cancel Appointment</button>
-                    )
-                  )}
+                    )}
+                  </div>
+
+                  {/* ── Card Actions ─────────────────────────── */}
+                  <div className="apt-actions">
+                    {(apt.status === 'pending' || apt.status === 'confirmed') && apt.paymentStatus !== 'unpaid' && (
+                      cancellingId === apt._id ? (
+                        <div className="cancel-confirm-row">
+                          <span className="cancel-confirm-label">
+                            <AlertTriangle size={13} />
+                            Confirm cancel?
+                          </span>
+                          <button
+                            onClick={() => handleCancel(apt._id)}
+                            className="btn btn-danger cancel-yes-btn"
+                          >
+                            <CheckCircle size={13} /> Yes
+                          </button>
+                          <button
+                            onClick={() => setCancellingId(null)}
+                            className="btn btn-outline cancel-no-btn"
+                          >
+                            <X size={13} /> No
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => handleCancel(apt._id)}
+                          className="btn btn-outline btn-danger cancel-btn"
+                        >
+                          <X size={14} />
+                          Cancel Appointment
+                        </button>
+                      )
+                    )}
+                  </div>
+
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </>
       )}

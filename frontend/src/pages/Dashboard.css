@@ -1,72 +1,445 @@
+/* ═══════════════════════════════════════════════════════════════
+   Dashboard.css — Premium Patient Dashboard Styles
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Page wrapper ──────────────────────────────────────────────── */
 .dashboard-page {
   padding-bottom: var(--space-2xl);
+  min-height: 100vh;
 }
 
+/* ── Header ────────────────────────────────────────────────────── */
 .dashboard-header {
-  border-bottom: 1px solid rgba(0,0,0,0.05);
-  padding-bottom: var(--space-md);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(37, 99, 235, 0.08);
+  flex-wrap: wrap;
 }
 
+.dashboard-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.dashboard-greeting {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #64748b;
+  letter-spacing: 0.02em;
+  margin: 0;
+}
+
+.dashboard-title {
+  font-size: 2rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #1e40af 0%, #0ea5e9 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0;
+  line-height: 1.15;
+}
+
+.dashboard-subtitle {
+  font-size: 0.9rem;
+  color: #94a3b8;
+  margin: 0;
+}
+
+.dashboard-book-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+  padding: 0.65rem 1.35rem;
+  font-size: 0.92rem;
+  font-weight: 700;
+  border-radius: 0.75rem;
+  background: linear-gradient(135deg, #2563eb 0%, #0ea5e9 100%);
+  border: none;
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.28);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  cursor: pointer;
+}
+
+.dashboard-book-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.38);
+}
+
+/* ── Section divider ───────────────────────────────────────────── */
+.section-divider {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 2rem 0 1.25rem;
+}
+
+.section-divider::before,
+.section-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(37, 99, 235, 0.15), transparent);
+}
+
+.section-divider-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #94a3b8;
+  white-space: nowrap;
+}
+
+/* ── Appointments grid ─────────────────────────────────────────── */
 .appointments-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: var(--space-lg);
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 1.35rem;
 }
 
+/* ── Appointment card ──────────────────────────────────────────── */
 .appointment-card {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  background: #fff;
+  border-radius: 1.25rem;
+  border: 1px solid rgba(37, 99, 235, 0.08);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.04),
+    0 4px 16px rgba(37, 99, 235, 0.06);
+  overflow: hidden;
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
 }
 
-.apt-body {
-  padding: var(--space-lg);
+.appointment-card:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 8px 32px rgba(37, 99, 235, 0.12),
+    0 2px 8px rgba(0, 0, 0, 0.06);
+  border-color: rgba(37, 99, 235, 0.2);
 }
 
-.apt-body h4 {
-  color: var(--primary-color);
-  margin-bottom: var(--space-xs);
-}
-
-.apt-details {
+/* ── Card top (avatar + name + badge) ─────────────────────────── */
+.apt-card-top {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-top: var(--space-sm);
-  padding-bottom: var(--space-sm);
-  border-bottom: 1px dashed rgba(0,0,0,0.1);
-  font-size: 0.9rem;
+  gap: 0.85rem;
+  padding: 1rem 1.1rem 0.85rem;
+  background: linear-gradient(135deg, #f0f7ff 0%, #e8f4fd 100%);
+  border-bottom: 1px solid rgba(37, 99, 235, 0.07);
+}
+
+.apt-doc-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2563eb 0%, #0ea5e9 100%);
+  color: #fff;
+  font-size: 1.3rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+  letter-spacing: -0.02em;
+}
+
+.apt-doc-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.apt-doc-name {
+  font-size: 0.97rem;
+  font-weight: 700;
+  color: #1e293b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.apt-doc-spec {
+  font-size: 0.78rem;
+  color: #64748b;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Card body ─────────────────────────────────────────────────── */
+.apt-body {
+  padding: 1rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  flex: 1;
+}
+
+.apt-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.83rem;
+  color: #475569;
   font-weight: 500;
 }
 
+.apt-meta-icon {
+  color: #94a3b8;
+  flex-shrink: 0;
+}
+
+/* ── Complete payment button ───────────────────────────────────── */
+.complete-payment-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.3rem;
+  padding: 0.42rem 0.95rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  border-radius: 0.6rem;
+  background: linear-gradient(135deg, #2563eb, #0ea5e9);
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(37, 99, 235, 0.28);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  align-self: flex-start;
+}
+
+.complete-payment-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.38);
+}
+
+/* ── Reason row ────────────────────────────────────────────────── */
+.apt-reason {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.83rem;
+  color: #475569;
+  margin-top: 0.35rem;
+  padding-top: 0.5rem;
+  border-top: 1px dashed rgba(0, 0, 0, 0.07);
+  line-height: 1.5;
+}
+
+.apt-reason strong {
+  color: #1e293b;
+  font-weight: 700;
+}
+
+/* ── Prescription block ────────────────────────────────────────── */
+.apt-prescription {
+  margin-top: 0.5rem;
+  background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%);
+  border-left: 3px solid #2563eb;
+  border-radius: 0 0.6rem 0.6rem 0;
+  padding: 0.65rem 0.85rem;
+}
+
+.apt-prescription-header {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #1e40af;
+  margin-bottom: 0.3rem;
+}
+
+.apt-prescription-text {
+  font-size: 0.83rem;
+  color: #475569;
+  line-height: 1.6;
+  white-space: pre-line;
+  margin: 0;
+}
+
+/* ── Card actions footer ───────────────────────────────────────── */
 .apt-actions {
-  background: var(--surface-color-secondary);
-  padding: var(--space-md) var(--space-lg);
+  background: linear-gradient(to right, #f8fafc, #f1f5f9);
+  padding: 0.75rem 1.1rem;
   display: flex;
   justify-content: flex-end;
-  gap: var(--space-sm);
+  align-items: center;
+  gap: 0.5rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  min-height: 56px;
 }
 
-/* Dashboard Forms (Doctor Profile) */
-.profile-form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-md);
+.cancel-confirm-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
-.full-width {
-  grid-column: 1 / -1;
+.cancel-confirm-label {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #92400e;
+  background: #fef3c7;
+  padding: 0.25rem 0.6rem;
+  border-radius: 0.5rem;
 }
 
-/* Medicine Calendar Styles */
+.cancel-yes-btn,
+.cancel-no-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.3rem 0.7rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.cancel-yes-btn:hover,
+.cancel-no-btn:hover {
+  transform: scale(1.04);
+}
+
+.cancel-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 0.38rem 0.85rem;
+  border-radius: 0.6rem;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.cancel-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+}
+
+/* ── Empty state ───────────────────────────────────────────────── */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 4rem 2rem;
+  background: linear-gradient(135deg, #f0f7ff 0%, #f8fafc 100%);
+  border: 1px dashed rgba(37, 99, 235, 0.2);
+  border-radius: 1.5rem;
+  margin-top: 1rem;
+}
+
+.empty-state-icon {
+  font-size: 3.5rem;
+  margin-bottom: 1rem;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+}
+
+.empty-state-heading {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #1e293b;
+  margin: 0 0 0.5rem;
+}
+
+.empty-state-sub {
+  font-size: 0.95rem;
+  color: #64748b;
+  max-width: 420px;
+  line-height: 1.65;
+  margin: 0 0 1.5rem;
+}
+
+/* ── Skeleton styles ───────────────────────────────────────────── */
+.skeleton {
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.6s infinite;
+  border-radius: 0.5rem;
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.skeleton-card {
+  border: 1px solid rgba(37, 99, 235, 0.06);
+  border-radius: 1.25rem;
+  overflow: hidden;
+}
+
+.skeleton-top {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 1rem 1.1rem 0.85rem;
+  background: #f8fafc;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.skeleton-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50% !important;
+  flex-shrink: 0;
+}
+
+.skeleton-text-block {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.skeleton-line {
+  border-radius: 0.4rem !important;
+}
+
+.skeleton-badge {
+  width: 68px;
+  height: 22px;
+  border-radius: 99px !important;
+}
+
+.skeleton-body {
+  padding: 1rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: #fff;
+}
+
+/* ── Medicine Calendar styles ──────────────────────────────────── */
 .medicine-calendar-container {
   margin-bottom: 2rem;
 }
+
 .cal-row {
   display: flex;
   justify-content: space-between;
   margin-bottom: 0.5rem;
 }
+
 .cal-cell {
   width: 14.28%;
   aspect-ratio: 1;
@@ -79,33 +452,40 @@
   transition: all 0.2s ease;
   position: relative;
 }
+
 .cal-cell:hover {
   background-color: var(--bg-main);
 }
+
 .cal-cell.disabled {
   color: var(--text-muted);
   pointer-events: none;
   opacity: 0.5;
 }
+
 .cal-cell.selected {
-  background-color: var(--primary);
+  background: linear-gradient(135deg, #2563eb 0%, #0ea5e9 100%);
   color: white;
-  box-shadow: 0 4px 10px rgba(59, 130, 246, 0.4);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.38);
 }
+
 .cal-cell.has-meds {
   font-weight: bold;
 }
+
 .cal-dot {
   width: 6px;
   height: 6px;
-  background-color: var(--primary);
+  background-color: #2563eb;
   border-radius: 50%;
   position: absolute;
   bottom: 10%;
 }
+
 .cal-cell.selected .cal-dot {
   background-color: white;
 }
+
 .btn-icon {
   background: transparent;
   border: none;
@@ -117,11 +497,12 @@
   border-radius: 0.5rem;
   transition: background 0.2s;
 }
+
 .btn-icon:hover {
   background: var(--bg-main);
 }
 
-/* Verification Status Banner */
+/* ── Verification Status Banner ────────────────────────────────── */
 .verification-banner {
   padding: 0.75rem 1.25rem;
   border-radius: 0.6rem;
@@ -129,7 +510,58 @@
   border-left: 4px solid;
   margin-bottom: 0.5rem;
 }
-.banner-approved { background: rgba(16,185,129,0.1);  border-color: #10b981; color: #10b981; }
-.banner-pending  { background: rgba(245,158,11,0.1);   border-color: #f59e0b; color: #d97706; }
-.banner-rejected { background: rgba(239,68,68,0.1);    border-color: #ef4444; color: #ef4444; }
 
+.banner-approved { background: rgba(16, 185, 129, 0.1);  border-color: #10b981; color: #10b981; }
+.banner-pending  { background: rgba(245, 158, 11, 0.1);  border-color: #f59e0b; color: #d97706; }
+.banner-rejected { background: rgba(239, 68, 68, 0.1);   border-color: #ef4444; color: #ef4444; }
+
+/* ── Dashboard Forms (Doctor Profile) ─────────────────────────── */
+.profile-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
+/* ── Responsive ────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .dashboard-title {
+    font-size: 1.6rem;
+  }
+
+  .dashboard-book-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .appointments-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .apt-card-top {
+    padding: 0.85rem 0.9rem 0.75rem;
+  }
+
+  .apt-body {
+    padding: 0.85rem 0.9rem;
+  }
+
+  .apt-actions {
+    padding: 0.65rem 0.9rem;
+  }
+
+  .cancel-confirm-row {
+    flex-direction: column;
+    align-items: flex-end;
+  }
+}

@@ -1,9 +1,31 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Star, Clock, DollarSign, ShieldCheck } from 'lucide-react';
+import { Star, Clock, IndianRupee, ShieldCheck } from 'lucide-react';
 import api from '../utils/api';
 import './DoctorList.css';
 
+/* ── Skeleton placeholder card ───────────────────────── */
+const SkeletonCard = () => (
+  <div className="skeleton-card">
+    <div className="skeleton-header">
+      <div className="skeleton skeleton-avatar" />
+      <div className="skeleton-header-lines">
+        <div className="skeleton skeleton-line-lg" />
+        <div className="skeleton skeleton-line-sm" />
+      </div>
+    </div>
+    <div className="skeleton-body">
+      <div className="skeleton skeleton-row" />
+      <div className="skeleton skeleton-row" />
+      <div className="skeleton skeleton-row" />
+    </div>
+    <div className="skeleton-footer">
+      <div className="skeleton skeleton-btn" />
+    </div>
+  </div>
+);
+
+/* ── Main component ──────────────────────────────────── */
 const DoctorList = () => {
   const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -23,61 +45,109 @@ const DoctorList = () => {
   }, []);
 
   return (
-    <div className="doctor-list-page container animate-fade-in">
-      <div className="mt-2 mb-2 text-center">
-        <h2>Find Your Specialist</h2>
-        <p className="text-muted">Browse through our extensive list of highly qualified medical professionals.</p>
+    <div className="doctor-list-page animate-fade-in">
+
+      {/* ── Hero ─────────────────────────────────────── */}
+      <div className="list-hero">
+        <div className="container">
+          <div className="list-hero-badge">🏥 Verified Specialists</div>
+          <h2>Find Your Specialist</h2>
+          <p>Browse through our network of highly qualified medical professionals.</p>
+        </div>
       </div>
 
-      {loading ? (
-        <div className="text-center mt-2"><p>Loading doctors...</p></div>
-      ) : doctors.length === 0 ? (
-        <div className="text-center mt-2"><p>No doctors available at the moment.</p></div>
-      ) : (
-        <div className="doctors-grid">
-          {doctors.map((doctor) => (
-            <div key={doctor._id} className="doctor-card card">
-              <div className="doctor-card-header">
-                <div>
-                  <h3 className="doctor-name">Dr. {doctor.userId?.name}</h3>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
-                    <p className="doctor-spec badge badge-success">{doctor.specialization}</p>
-                    {doctor.verified && (
-                      <span style={{
-                        display: 'inline-flex', alignItems: 'center', gap: '0.25rem',
-                        background: 'rgba(16,185,129,0.12)', color: '#10b981',
-                        fontSize: '0.72rem', fontWeight: 700, padding: '0.2rem 0.5rem',
-                        borderRadius: '999px', border: '1px solid rgba(16,185,129,0.3)',
-                      }}>
-                        <ShieldCheck size={11} /> Verified Doctor
-                      </span>
-                    )}
+      {/* ── Grid ─────────────────────────────────────── */}
+      <div className="container">
+        {loading ? (
+          <div className="doctors-grid">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <SkeletonCard key={i} />
+            ))}
+          </div>
+        ) : doctors.length === 0 ? (
+          <div className="empty-state">
+            <div className="empty-state-icon">🩺</div>
+            <h3>No Doctors Available</h3>
+            <p>Check back soon — our network is growing every day.</p>
+          </div>
+        ) : (
+          <div className="doctors-grid">
+            {doctors.map((doctor) => {
+              const name = doctor.userId?.name ?? 'Doctor';
+              const initial = name.charAt(0).toUpperCase();
+
+              return (
+                <div key={doctor._id} className="doctor-card">
+
+                  {/* Header */}
+                  <div className="doctor-card-header">
+                    <div className="doc-avatar-list">{initial}</div>
+                    <div className="doctor-header-info">
+                      <div className="doctor-name">Dr. {name}</div>
+                      <div className="doctor-spec-wrap">
+                        <span className="doctor-spec-badge">
+                          {doctor.specialization}
+                        </span>
+                        {doctor.verified && (
+                          <span className="doctor-verified-badge">
+                            <ShieldCheck size={11} />
+                            Verified
+                          </span>
+                        )}
+                      </div>
+                    </div>
                   </div>
+
+                  {/* Body */}
+                  <div className="doctor-card-body">
+                    <div className="doctor-info-row">
+                      <Star size={15} />
+                      <div>
+                        <span className="info-label-txt">Experience</span>
+                        <span className="info-value-txt">
+                          {doctor.experience} Years
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="doctor-info-row">
+                      <IndianRupee size={15} />
+                      <div>
+                        <span className="info-label-txt">Consultation Fee</span>
+                        <span className="info-value-txt">
+                          ₹{doctor.consultationFee}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="doctor-info-row">
+                      <Clock size={15} />
+                      <div>
+                        <span className="info-label-txt">Available Timing</span>
+                        <span className="info-value-txt">
+                          {doctor.availableTiming?.start} – {doctor.availableTiming?.end}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Footer */}
+                  <div className="doctor-card-footer">
+                    <Link
+                      to={`/doctors/${doctor._id}`}
+                      className="btn-book"
+                    >
+                      Book Appointment →
+                    </Link>
+                  </div>
+
                 </div>
-              </div>
-              <div className="doctor-card-body">
-                <div className="doctor-info-row">
-                  <Star size={16} className="text-muted" />
-                  <span>{doctor.experience} Years Experience</span>
-                </div>
-                <div className="doctor-info-row">
-                  <DollarSign size={16} className="text-muted" />
-                  <span>Fee: ${doctor.consultationFee}</span>
-                </div>
-                <div className="doctor-info-row">
-                  <Clock size={16} className="text-muted" />
-                  <span>{doctor.availableTiming?.start} - {doctor.availableTiming?.end}</span>
-                </div>
-              </div>
-              <div className="doctor-card-footer">
-                <Link to={`/doctors/${doctor._id}`} className="btn btn-outline" style={{width: '100%'}}>
-                  View Profile & Book
-                </Link>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+              );
+            })}
+          </div>
+        )}
+      </div>
+
     </div>
   );
 };

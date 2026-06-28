@@ -1,14 +1,31 @@
+/* ═══════════════════════════════════════════════════════════════
+   Navbar — Premium Healthcare UI
+   ═══════════════════════════════════════════════════════════════ */
+
 .navbar {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
-  height: 80px;
+  height: 72px;
   z-index: 1000;
   display: flex;
   align-items: center;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+  transition: box-shadow 0.3s ease, background 0.3s ease, border-color 0.3s ease;
 }
 
+/* Scroll elevation */
+.navbar.scrolled {
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 4px 24px rgba(15, 23, 42, 0.08);
+  border-color: rgba(226, 232, 240, 0.9);
+}
+
+/* ── Layout ─────────────────────────────────────────────────── */
 .navbar-container {
   display: flex;
   justify-content: space-between;
@@ -16,42 +33,119 @@
   width: 100%;
 }
 
+/* ── Logo ───────────────────────────────────────────────────── */
 .navbar-logo {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--primary-color);
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  text-decoration: none;
   letter-spacing: -0.02em;
 }
 
 .nav-icon {
-  color: var(--primary-color);
+  color: #2563eb;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
 }
 
+.navbar-logo-text {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.03em;
+}
+
+.navbar-logo-accent {
+  background: linear-gradient(135deg, #2563eb, #0ea5e9);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Links list ─────────────────────────────────────────────── */
 .navbar-links {
   list-style: none;
   display: flex;
-  gap: var(--space-md);
+  gap: 0.75rem;
   align-items: center;
+  margin: 0;
+  padding: 0;
 }
 
+/* ── "Find Doctors" ghost link ──────────────────────────────── */
+.navbar-link-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.45rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #374151;
+  text-decoration: none;
+  transition: background 0.2s, color 0.2s;
+}
+
+.navbar-link-btn:hover {
+  background: #f0f4ff;
+  color: #2563eb;
+}
+
+/* ── User badge ─────────────────────────────────────────────── */
 .navbar-user {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
-  color: var(--text-muted);
-  font-weight: 500;
+  gap: 0.4rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #374151;
 }
 
+.navbar-user-name {
+  color: #0f172a;
+  font-weight: 700;
+}
+
+/* ── Logout button ──────────────────────────────────────────── */
 .nav-logout {
   background: transparent;
-  color: var(--text-main);
-  padding: 0.5rem;
-  border: 1px solid transparent;
+  color: #374151;
+  padding: 0.45rem 0.85rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
 }
+
 .nav-logout:hover {
-  background: #f1f5f9;
-  color: var(--danger-color);
+  background: #fef2f2;
+  color: #dc2626;
+  border-color: #fecaca;
+}
+
+/* ── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .navbar-logo-text {
+    font-size: 1.15rem;
+  }
+
+  .navbar-links {
+    gap: 0.4rem;
+  }
+
+  .navbar-link-btn {
+    padding: 0.4rem 0.7rem;
+    font-size: 0.82rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar-user-name {
+    display: none;
+  }
 }

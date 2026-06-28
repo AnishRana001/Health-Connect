@@ -1,9 +1,14 @@
-/* ── Doctor Profile Page ─────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════
+   DoctorProfile.css — Premium Doctor Profile Page Styles
+   ═══════════════════════════════════════════════════════════════ */
 
+/* ── Page wrapper ──────────────────────────────────────────────── */
 .doctor-profile-page {
   padding-bottom: var(--space-2xl);
+  min-height: 100vh;
 }
 
+/* ── Two-column layout ─────────────────────────────────────────── */
 .profile-layout {
   display: grid;
   grid-template-columns: 5fr 4fr;
@@ -16,156 +21,361 @@
   }
 }
 
-/* ── Doctor Info Card ──────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════
+   LEFT CARD — Doctor Info
+   ═══════════════════════════════════════════════════════════════ */
 
 .profile-details {
-  padding: var(--space-xl);
+  border-radius: 1.25rem;
+  overflow: hidden;
+  border: 1px solid rgba(37, 99, 235, 0.1);
+  box-shadow:
+    0 1px 3px rgba(0,0,0,0.04),
+    0 8px 28px rgba(37, 99, 235, 0.08);
+  padding: 0;
 }
 
-.profile-header {
+/* ── Gradient header band ──────────────────────────────────────── */
+.profile-details-header {
   display: flex;
-  align-items: flex-start;
-  gap: 1rem;
+  align-items: center;
+  gap: 1.1rem;
+  padding: 1.6rem 1.75rem;
+  background: linear-gradient(135deg, #1e40af 0%, #2563eb 45%, #0ea5e9 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Decorative orbs */
+.profile-details-header::before {
+  content: '';
+  position: absolute;
+  top: -30px;
+  right: -30px;
+  width: 120px;
+  height: 120px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
+}
+
+.profile-details-header::after {
+  content: '';
+  position: absolute;
+  bottom: -20px;
+  right: 60px;
+  width: 70px;
+  height: 70px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 50%;
 }
 
 .doc-avatar {
-  width: 68px;
-  height: 68px;
+  width: 72px;
+  height: 72px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #2563eb, #0ea5e9);
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(8px);
+  border: 2px solid rgba(255, 255, 255, 0.45);
   color: white;
-  font-size: 1.8rem;
+  font-size: 1.9rem;
   font-weight: 800;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  box-shadow: 0 4px 14px rgba(37,99,235,0.32);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  letter-spacing: -0.02em;
+  position: relative;
+  z-index: 1;
 }
 
-.profile-header h2 {
-  color: var(--primary-color);
-  margin-bottom: 0.1rem;
-  font-size: 1.7rem;
-  line-height: 1.2;
+.profile-header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  position: relative;
+  z-index: 1;
+}
+
+.profile-doctor-name {
+  font-size: 1.65rem;
+  font-weight: 800;
+  color: #fff;
+  margin: 0;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.15);
+}
+
+.profile-badges-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.profile-spec-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.25rem 0.75rem;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(4px);
+  letter-spacing: 0.02em;
 }
 
 .verified-badge {
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
-  background: rgba(16, 185, 129, 0.12);
-  color: #10b981;
-  font-size: 0.78rem;
+  background: rgba(16, 185, 129, 0.15);
+  color: #6ee7b7;
+  font-size: 0.75rem;
   font-weight: 700;
   padding: 0.25rem 0.65rem;
   border-radius: 999px;
-  border: 1px solid rgba(16, 185, 129, 0.35);
+  border: 1px solid rgba(110, 231, 183, 0.4);
+  backdrop-filter: blur(4px);
+}
+
+/* ── Profile details body ──────────────────────────────────────── */
+.profile-details-body {
+  padding: 1.5rem 1.75rem 1.75rem;
 }
 
 .about-text {
-  font-size: 1rem;
-  line-height: 1.75;
-  color: var(--text-muted);
+  font-size: 0.96rem;
+  line-height: 1.78;
+  color: #64748b;
 }
 
 .profile-divider {
   border: 0;
   height: 1px;
-  background: rgba(0,0,0,0.06);
-  margin: var(--space-lg) 0;
+  background: linear-gradient(to right, transparent, rgba(37, 99, 235, 0.12), transparent);
+  margin: 1.25rem 0;
 }
 
+/* ── Info grid ─────────────────────────────────────────────────── */
 .info-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--space-lg);
+  gap: 1.25rem;
 }
 
 .info-item {
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
+  gap: 0.35rem;
+  background: #f8fafc;
+  border: 1px solid rgba(37, 99, 235, 0.07);
+  border-radius: 0.85rem;
+  padding: 0.85rem 1rem;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.info-item:hover {
+  background: #eff6ff;
+  border-color: rgba(37, 99, 235, 0.15);
 }
 
 .info-label {
-  font-size: 0.78rem;
-  font-weight: 600;
+  font-size: 0.72rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.07em;
+  color: #94a3b8;
   display: flex;
   align-items: center;
 }
 
 .info-value {
-  font-weight: 600;
-  font-size: 1rem;
+  font-weight: 700;
+  font-size: 0.97rem;
+  color: #1e293b;
 }
 
+/* ── Slot duration pill ────────────────────────────────────────── */
 .slot-duration-pill {
-  margin-top: 1rem;
+  margin-top: 1.1rem;
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.35rem 0.85rem;
-  background: rgba(37,99,235,0.06);
-  border: 1px solid rgba(37,99,235,0.2);
+  gap: 0.45rem;
+  padding: 0.38rem 0.9rem;
+  background: linear-gradient(135deg, rgba(37,99,235,0.06) 0%, rgba(14,165,233,0.06) 100%);
+  border: 1px solid rgba(37, 99, 235, 0.18);
   border-radius: 999px;
   font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--primary-color);
+  font-weight: 700;
+  color: #2563eb;
 }
 
-/* ── Booking Card ───────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════
+   RIGHT CARD — Booking Section
+   ═══════════════════════════════════════════════════════════════ */
 
 .booking-section {
-  padding: var(--space-xl);
+  border-radius: 1.25rem;
+  overflow: hidden;
+  border: 1px solid rgba(37, 99, 235, 0.1);
+  box-shadow:
+    0 1px 3px rgba(0,0,0,0.04),
+    0 8px 28px rgba(37, 99, 235, 0.08);
   position: sticky;
   top: 100px;
+  padding: 0;
 }
 
-.booking-header {
-  margin-bottom: 1.25rem;
-  padding-bottom: 0.9rem;
-  border-bottom: 2px solid var(--surface-color-secondary);
+/* ── Booking gradient header ───────────────────────────────────── */
+.booking-section-header {
+  padding: 1.3rem 1.6rem 1.1rem;
+  background: linear-gradient(135deg, #f0f7ff 0%, #e8f4fd 100%);
+  border-bottom: 1px solid rgba(37, 99, 235, 0.1);
 }
 
 .booking-title {
-  font-size: 1.35rem;
-  margin-bottom: 0.2rem;
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #1e40af;
+  margin: 0 0 0.2rem;
+  letter-spacing: -0.01em;
 }
 
 .booking-subtitle {
-  font-size: 0.85rem;
-  color: var(--text-muted);
+  font-size: 0.84rem;
+  color: #64748b;
   margin: 0;
+  font-weight: 500;
 }
 
+/* ── Booking body ──────────────────────────────────────────────── */
+.booking-section-body {
+  padding: 1.35rem 1.6rem 1.6rem;
+}
+
+/* ── Full-width button ─────────────────────────────────────────── */
 .btn-full {
   width: 100%;
-  padding: 0.8rem;
+  padding: 0.88rem 1.2rem;
   font-size: 1rem;
-  margin-top: 0.5rem;
-}
-
-.booking-alert {
-  padding: var(--space-md);
-  border-radius: var(--radius-md);
+  font-weight: 700;
+  margin-top: 0.75rem;
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
-  margin-bottom: var(--space-md);
-  font-size: 0.9rem;
+  justify-content: center;
+  gap: 0.4rem;
+  border-radius: 0.85rem;
+  background: linear-gradient(135deg, #2563eb 0%, #0ea5e9 100%);
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 4px 18px rgba(37, 99, 235, 0.3);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  letter-spacing: 0.01em;
+}
+
+.btn-full:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(37, 99, 235, 0.42);
+}
+
+.btn-full:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  background: linear-gradient(135deg, #93c5fd, #7dd3fc);
+}
+
+/* ── Inline spinner ────────────────────────────────────────────── */
+.btn-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Alert ─────────────────────────────────────────────────────── */
+.booking-alert {
+  padding: 0.8rem 1rem;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  line-height: 1.45;
 }
 
 .alert-error {
   background: #fef2f2;
-  color: var(--danger-color);
-  border-left: 4px solid var(--danger-color);
+  color: #991b1b;
+  border: 1px solid #fecaca;
+  border-left: 4px solid #ef4444;
 }
 
 .alert-success {
-  background: #dcfce7;
+  background: #f0fdf4;
   color: #166534;
-  border-left: 4px solid #166534;
+  border: 1px solid #bbf7d0;
+  border-left: 4px solid #22c55e;
+}
+
+/* ── Responsive ────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .booking-section {
+    position: static;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .profile-details-header {
+    padding: 1.25rem 1.25rem;
+  }
+
+  .profile-doctor-name {
+    font-size: 1.35rem;
+  }
+
+  .doc-avatar {
+    width: 58px;
+    height: 58px;
+    font-size: 1.5rem;
+  }
+
+  .profile-details-body {
+    padding: 1.25rem;
+  }
+
+  .booking-section-body {
+    padding: 1.1rem 1.25rem 1.25rem;
+  }
+
+  .booking-section-header {
+    padding: 1.1rem 1.25rem 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-badges-row {
+    gap: 0.35rem;
+  }
 }

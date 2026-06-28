@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { ShieldAlert, ShieldCheck, Clock, DollarSign, Stethoscope, Calendar } from 'lucide-react';
+import {
+  ShieldAlert, ShieldCheck, Clock, DollarSign,
+  Stethoscope, Calendar, ArrowRight,
+} from 'lucide-react';
 import api from '../utils/api';
 import SlotPicker from '../components/SlotPicker';
 import './DoctorProfile.css';
@@ -78,17 +81,19 @@ const DoctorProfile = () => {
     }
   };
 
+  /* ── Loading skeleton ──────────────────────────────────────── */
   if (loading) {
     return (
       <div className="doctor-profile-page container animate-fade-in" style={{ paddingTop: '2rem' }}>
         <div className="profile-layout mt-2 gap-2">
-          <div className="skeleton" style={{ height: '420px', borderRadius: '1rem' }} />
-          <div className="skeleton" style={{ height: '560px', borderRadius: '1rem' }} />
+          <div className="skeleton" style={{ height: '420px', borderRadius: '1.25rem' }} />
+          <div className="skeleton" style={{ height: '560px', borderRadius: '1.25rem' }} />
         </div>
       </div>
     );
   }
 
+  /* ── Not found ─────────────────────────────────────────────── */
   if (!doctor) return (
     <div className="container mt-2" style={{ textAlign: 'center', paddingTop: '4rem' }}>
       <p style={{ fontSize: '1.1rem', color: 'var(--text-muted)' }}>Doctor not found.</p>
@@ -96,6 +101,8 @@ const DoctorProfile = () => {
   );
 
   const canBook = true;
+  const isLoading = bookingState.status === 'loading';
+  const isSlotSelected = !!(selection.date && selection.time);
 
   return (
     <div className="doctor-profile-page container animate-fade-in">
@@ -103,15 +110,18 @@ const DoctorProfile = () => {
 
         {/* ── LEFT: Doctor info ─────────────────────────────────────── */}
         <div className="profile-details card">
-          <div className="profile-header">
-            {/* Avatar placeholder with initials */}
+
+          {/* Gradient Header Band */}
+          <div className="profile-details-header">
             <div className="doc-avatar">
               {doctor.userId?.name?.charAt(0).toUpperCase() || 'D'}
             </div>
-            <div>
-              <h2>Dr. {doctor.userId?.name}</h2>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', marginTop: '0.4rem' }}>
-                <span className="badge badge-success">{doctor.specialization}</span>
+            <div className="profile-header-text">
+              <h2 className="profile-doctor-name">Dr. {doctor.userId?.name}</h2>
+              <div className="profile-badges-row">
+                <span className="badge badge-success profile-spec-badge">
+                  {doctor.specialization}
+                </span>
                 {doctor.verified && (
                   <span className="verified-badge">
                     <ShieldCheck size={13} /> Verified Doctor
@@ -121,7 +131,8 @@ const DoctorProfile = () => {
             </div>
           </div>
 
-          <div className="profile-body mt-1">
+          {/* Profile Body */}
+          <div className="profile-details-body">
             <p className="about-text">{doctor.about || 'No details provided by the doctor.'}</p>
             <hr className="profile-divider" />
 
@@ -136,7 +147,7 @@ const DoctorProfile = () => {
                 <span className="info-label text-muted">
                   <DollarSign size={13} style={{ marginRight: '0.3rem' }} />Consultation Fee
                 </span>
-                <span className="info-value">${doctor.consultationFee}</span>
+                <span className="info-value">₹{doctor.consultationFee}</span>
               </div>
               <div className="info-item">
                 <span className="info-label text-muted">
@@ -165,61 +176,77 @@ const DoctorProfile = () => {
 
         {/* ── RIGHT: Booking section ────────────────────────────────── */}
         <div className="booking-section card">
-          <div className="booking-header">
+
+          {/* Gradient booking header */}
+          <div className="booking-section-header">
             <h3 className="booking-title">Book an Appointment</h3>
             <p className="booking-subtitle">Select a date and available time slot below.</p>
           </div>
 
-          {/* Status alerts */}
-          {bookingState.status === 'error' && (
-            <div className="booking-alert alert-error">
-              <ShieldAlert size={18} /> {bookingState.message}
-            </div>
-          )}
+          {/* Booking body */}
+          <div className="booking-section-body">
 
-          {canBook && (
-            <form onSubmit={handleBooking}>
-              {/* SlotPicker */}
-              <div className="form-group">
-                <label className="form-label" style={{ marginBottom: '0.6rem', display: 'block' }}>
-                  Choose Date &amp; Time
-                </label>
-                <SlotPicker
-                  doctorId={doctor._id}
-                  workingDays={doctor.availableDays}
-                  unavailableDates={doctor.unavailableDates || []}
-                  onSelect={handleSlotSelect}
-                />
+            {/* Error alert */}
+            {bookingState.status === 'error' && (
+              <div className="booking-alert alert-error">
+                <ShieldAlert size={18} /> {bookingState.message}
               </div>
+            )}
 
-              {/* Reason */}
-              <div className="form-group mt-1">
-                <label className="form-label">Reason for Visit</label>
-                <textarea
-                  className="form-control"
-                  rows="3"
-                  required
-                  placeholder="Describe your symptoms briefly…"
-                  value={reason}
-                  onChange={(e) => setReason(e.target.value)}
-                />
-              </div>
+            {canBook && (
+              <form onSubmit={handleBooking}>
+                {/* SlotPicker */}
+                <div className="form-group">
+                  <label className="form-label" style={{ marginBottom: '0.6rem', display: 'block' }}>
+                    Choose Date &amp; Time
+                  </label>
+                  <SlotPicker
+                    doctorId={doctor._id}
+                    workingDays={doctor.availableDays}
+                    unavailableDates={doctor.unavailableDates || []}
+                    onSelect={handleSlotSelect}
+                  />
+                </div>
 
-              <button
-                type="submit"
-                className="btn btn-primary btn-full"
-                disabled={bookingState.status === 'loading' || !selection.date || !selection.time}
-              >
-                {bookingState.status === 'loading' ? 'Booking…' : 'Confirm Booking'}
-              </button>
+                {/* Reason */}
+                <div className="form-group mt-1">
+                  <label className="form-label">Reason for Visit</label>
+                  <textarea
+                    className="form-control"
+                    rows="3"
+                    required
+                    placeholder="Describe your symptoms briefly…"
+                    value={reason}
+                    onChange={(e) => setReason(e.target.value)}
+                  />
+                </div>
 
-              {!user && (
-                <p className="text-muted text-center mt-1">
-                  <small>You must be logged in as a patient to book.</small>
-                </p>
-              )}
-            </form>
-          )}
+                <button
+                  type="submit"
+                  className="btn btn-primary btn-full"
+                  disabled={isLoading || !isSlotSelected}
+                >
+                  {isLoading ? (
+                    <>
+                      <span className="btn-spinner" />
+                      Booking…
+                    </>
+                  ) : (
+                    <>
+                      {isSlotSelected ? 'Proceed to Payment' : 'Confirm Booking'}
+                      <ArrowRight size={16} style={{ marginLeft: '0.4rem' }} />
+                    </>
+                  )}
+                </button>
+
+                {!user && (
+                  <p className="text-muted text-center mt-1">
+                    <small>You must be logged in as a patient to book.</small>
+                  </p>
+                )}
+              </form>
+            )}
+          </div>
         </div>
 
       </div>
