@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Stethoscope, LogOut, LayoutDashboard, ShieldCheck } from 'lucide-react';
+// NEW: Notification bell component
+import NotificationBell from './NotificationBell';
 import './Navbar.css';
 
 const getDashboardPath = (role) => {
@@ -106,6 +108,11 @@ const Navbar = () => {
                     </>
                   )}
                 </Link>
+              </li>
+
+              {/* NEW: Notification Bell — shows live unread badge */}
+              <li>
+                <NotificationBell />
               </li>
 
               {/* Logout */}

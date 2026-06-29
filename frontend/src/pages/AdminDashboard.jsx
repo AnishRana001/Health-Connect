@@ -1,15 +1,17 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
   Users, Stethoscope, Clock, CalendarCheck, ShieldCheck,
-  FileText, Trash2, CheckCircle, XCircle, RefreshCw,
+  FileText, Trash2, CheckCircle, XCircle, RefreshCw, Activity,
 } from 'lucide-react';
+import { formatDistanceToNow } from 'date-fns';
 import api from '../utils/api';
 import { useToast } from '../context/ToastContext';
 import './AdminDashboard.css';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-const TABS = ['Overview', 'Doctor Verification', 'Users', 'Appointments'];
+// NEW: Added 'Activity Log' tab
+const TABS = ['Overview', 'Doctor Verification', 'Users', 'Appointments', 'Activity Log'];
 
 // ── Shared UI atoms ───────────────────────────────────────────────────────────
 
@@ -257,6 +259,77 @@ const AppointmentsTab = ({ appointments }) => {
   );
 };
 
+// ── NEW: Activity Log Tab ────────────────────────────────────────────────────
+
+// Maps action enum to badge colour + label
+const ACTION_META = {
+  appointment_booked:    { color: '#3b82f6', bg: '#eff6ff', label: 'Booked'    },
+  appointment_confirmed: { color: '#10b981', bg: '#f0fdf4', label: 'Confirmed' },
+  appointment_cancelled: { color: '#ef4444', bg: '#fef2f2', label: 'Cancelled' },
+  doctor_approved:       { color: '#10b981', bg: '#f0fdf4', label: 'Approved'  },
+  doctor_rejected:       { color: '#f59e0b', bg: '#fffbeb', label: 'Rejected'  },
+  payment_completed:     { color: '#8b5cf6', bg: '#faf5ff', label: 'Payment'   },
+};
+
+const ActivityLogTab = ({ logs, loading }) => {
+  if (loading) return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
+      {[...Array(6)].map((_, i) => (
+        <div key={i} style={{ height: '64px', borderRadius: '0.75rem', background: '#e2e8f0' }} className="skeleton" />
+      ))}
+    </div>
+  );
+
+  if (!logs.length) return <EmptyState message="No activity recorded yet." />;
+
+  return (
+    <div className="card" style={{ overflow: 'hidden', padding: 0 }}>
+      {logs.map((log, i) => {
+        const meta = ACTION_META[log.action] || { color: '#64748b', bg: '#f8fafc', label: log.action };
+        return (
+          <div
+            key={log._id}
+            style={{
+              display: 'flex', alignItems: 'center', gap: '1rem',
+              padding: '0.85rem 1.25rem',
+              borderBottom: i < logs.length - 1 ? '1px solid #f1f5f9' : 'none',
+              borderLeft: `3px solid ${meta.color}`,
+            }}
+          >
+            {/* Action badge */}
+            <span style={{
+              flexShrink: 0, fontSize: '0.7rem', fontWeight: 700,
+              padding: '0.2rem 0.6rem', borderRadius: '9999px',
+              background: meta.bg, color: meta.color, minWidth: '70px', textAlign: 'center',
+            }}>
+              {meta.label}
+            </span>
+
+            {/* Description */}
+            <span style={{ flex: 1, fontSize: '0.85rem', color: '#334155', lineHeight: 1.4 }}>
+              {log.description}
+            </span>
+
+            {/* Role badge */}
+            <span style={{
+              flexShrink: 0, fontSize: '0.68rem', fontWeight: 600,
+              padding: '0.15rem 0.45rem', borderRadius: '9999px',
+              background: '#f1f5f9', color: '#64748b', textTransform: 'capitalize',
+            }}>
+              {log.role}
+            </span>
+
+            {/* Timestamp */}
+            <span style={{ flexShrink: 0, fontSize: '0.75rem', color: '#94a3b8', minWidth: '90px', textAlign: 'right' }}>
+              {formatDistanceToNow(new Date(log.timestamp), { addSuffix: true })}
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
 // ── Skeleton Loader ───────────────────────────────────────────────────────────
 
 const SkeletonLoader = () => (
@@ -282,6 +355,9 @@ const AdminDashboard = () => {
   const [appointments, setAppointments] = useState([]);
   const [loading,      setLoading]      = useState(true);
   const [error,        setError]        = useState('');
+  // NEW: Activity log state
+  const [activityLogs,    setActivityLogs]    = useState([]);
+  const [activityLoading, setActivityLoading] = useState(false);
 
   const fetchAll = useCallback(async () => {
     setLoading(true);
@@ -303,6 +379,24 @@ const AdminDashboard = () => {
       setLoading(false);
     }
   }, []);
+
+  // NEW: Fetch activity logs (separate request to avoid slowing main load)
+  const fetchActivityLogs = useCallback(async () => {
+    setActivityLoading(true);
+    try {
+      const { data } = await api.get('/admin/activity?limit=30');
+      setActivityLogs(data);
+    } catch {
+      // silently fail
+    } finally {
+      setActivityLoading(false);
+    }
+  }, []);
+
+  // Fetch activity log when tab switches to it
+  useEffect(() => {
+    if (activeTab === 'Activity Log') fetchActivityLogs();
+  }, [activeTab, fetchActivityLogs]);
 
   useEffect(() => { fetchAll(); }, [fetchAll]);
 
@@ -380,6 +474,8 @@ const AdminDashboard = () => {
           {activeTab === 'Doctor Verification' && <DoctorVerificationTab doctors={doctors}      onVerify={handleVerify} />}
           {activeTab === 'Users'               && <UsersTab              users={users}          onDeleteUser={handleDeleteUser} />}
           {activeTab === 'Appointments'        && <AppointmentsTab       appointments={appointments} />}
+          {/* NEW: Activity Log tab */}
+          {activeTab === 'Activity Log'        && <ActivityLogTab        logs={activityLogs}    loading={activityLoading} />}
         </>
       )}
     </div>

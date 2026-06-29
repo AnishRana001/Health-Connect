@@ -1,6 +1,8 @@
 import User from '../models/User.js';
 import Doctor from '../models/Doctor.js';
 import Appointment from '../models/Appointment.js';
+// ── NEW: Notification + Activity Log services ──────────────────────────────────
+import NotificationService, { ActivityLogService } from '../services/notificationService.js';
 
 // @desc    Get dashboard stats
 // @route   GET /api/admin/stats
@@ -50,6 +52,46 @@ export const verifyDoctor = async (req, res) => {
     doctor.verified           = status === 'approved';   // sync boolean
     doctor.verificationNote   = note || '';
     await doctor.save();
+
+    // ── NEW: Notify the doctor via Socket.IO + log activity ──────────────
+    const doctorUserId = doctor.userId._id.toString();
+    const doctorName   = doctor.userId.name;
+
+    if (status === 'approved') {
+      NotificationService.send({
+        recipientId:   doctorUserId,
+        recipientRole: 'doctor',
+        senderId:      req.user._id.toString(),
+        type:          'doctor_verified',
+        title:         'Account Verified ✓',
+        message:       'Congratulations! Your doctor account has been approved. You can now accept patient appointments.',
+      });
+
+      ActivityLogService.log({
+        userId:      req.user._id,
+        role:        'admin',
+        action:      'doctor_approved',
+        description: `Admin approved Dr. ${doctorName}'s verification request.`,
+      });
+
+    } else {
+      const reason = note ? ` Reason: ${note}` : '';
+      NotificationService.send({
+        recipientId:   doctorUserId,
+        recipientRole: 'doctor',
+        senderId:      req.user._id.toString(),
+        type:          'doctor_rejected',
+        title:         'Verification Rejected',
+        message:       `Your verification request has been rejected.${reason} Please review your documents and re-submit.`,
+      });
+
+      ActivityLogService.log({
+        userId:      req.user._id,
+        role:        'admin',
+        action:      'doctor_rejected',
+        description: `Admin rejected Dr. ${doctorName}'s verification request.${note ? ' Note: ' + note : ''}`,
+      });
+    }
 
     res.json(doctor);
   } catch (error) {

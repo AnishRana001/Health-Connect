@@ -1,6 +1,8 @@
 import Appointment from '../models/Appointment.js';
 import Doctor from '../models/Doctor.js';
 import { generateSlots } from './availabilityController.js';
+// ── NEW: Notification + Activity Log services ──────────────────────────────────
+import NotificationService, { ActivityLogService } from '../services/notificationService.js';
 
 /* helper: short weekday from YYYY-MM-DD using UTC to avoid tz shift */
 const dayShortName = (dateStr) => {
@@ -48,7 +50,7 @@ export const bookAppointment = async (req, res) => {
     await releaseExpiredReservations();
 
     // ── 1. Doctor exists and is approved ──────────────────────────────────
-    const doctor = await Doctor.findById(doctorId);
+    const doctor = await Doctor.findById(doctorId).populate('userId', 'name email');
     if (!doctor) {
       return res.status(404).json({ message: 'Doctor not found.' });
     }
@@ -91,7 +93,6 @@ export const bookAppointment = async (req, res) => {
       date,
       time,
       status: { $nin: ['cancelled'] },
-      // Only block if still within reservation window OR already paid/confirmed
       $or: [
         { paymentStatus: { $in: ['paid', 'pay_at_clinic'] } },
         { paymentStatus: 'unpaid', reservationExpiresAt: { $gt: new Date() } },
@@ -115,6 +116,26 @@ export const bookAppointment = async (req, res) => {
       reservationExpiresAt: new Date(Date.now() + 15 * 60 * 1000),
     });
 
+    // ── 7. NEW: Notify doctor + log activity ──────────────────────────────
+    // Notify doctor about new appointment (fire-and-forget)
+    NotificationService.send({
+      recipientId:   doctor.userId._id.toString(),
+      recipientRole: 'doctor',
+      senderId:      req.user._id.toString(),
+      type:          'appointment_booked',
+      title:         'New Appointment Booked',
+      message:       `${req.user.name} has booked an appointment on ${date} at ${time}.`,
+      appointmentId: appointment._id.toString(),
+    });
+
+    // Log the action for admin activity feed
+    ActivityLogService.log({
+      userId:      req.user._id,
+      role:        'patient',
+      action:      'appointment_booked',
+      description: `${req.user.name} booked an appointment with Dr. ${doctor.userId.name} on ${date} at ${time}.`,
+    });
+
     res.status(201).json(appointment);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -133,7 +154,8 @@ export const confirmPayment = async (req, res) => {
       return res.status(400).json({ message: 'Invalid payment method.' });
     }
 
-    const appointment = await Appointment.findById(req.params.id);
+    const appointment = await Appointment.findById(req.params.id)
+      .populate({ path: 'doctorId', populate: { path: 'userId', select: 'name' } });
 
     if (!appointment) {
       return res.status(404).json({ message: 'Appointment not found.' });
@@ -168,7 +190,7 @@ export const confirmPayment = async (req, res) => {
     if (paymentMethod === 'cash') {
       appointment.paymentStatus = 'pay_at_clinic';
       appointment.status = 'confirmed';
-      appointment.mockTransactionId = null; // no digital txn for cash
+      appointment.mockTransactionId = null;
     } else {
       appointment.paymentStatus = 'paid';
       appointment.status = 'confirmed';
@@ -176,6 +198,45 @@ export const confirmPayment = async (req, res) => {
     }
 
     const updated = await appointment.save();
+
+    // ── NEW: Notify both patient and doctor about payment/confirmation ─────
+    const doctorUserId   = appointment.doctorId?.userId?._id?.toString();
+    const doctorName     = appointment.doctorId?.userId?.name || 'your doctor';
+    const txnInfo        = appointment.mockTransactionId
+      ? ` (Txn: ${appointment.mockTransactionId})`
+      : '';
+
+    // Patient confirmation
+    NotificationService.send({
+      recipientId:   req.user._id.toString(),
+      recipientRole: 'patient',
+      type:          'payment_success',
+      title:         'Payment Successful',
+      message:       `Payment confirmed for your appointment with Dr. ${doctorName} on ${appointment.date} at ${appointment.time}.${txnInfo}`,
+      appointmentId: appointment._id.toString(),
+    });
+
+    // Doctor booking notification
+    if (doctorUserId) {
+      NotificationService.send({
+        recipientId:   doctorUserId,
+        recipientRole: 'doctor',
+        senderId:      req.user._id.toString(),
+        type:          'payment_success',
+        title:         'Appointment Payment Received',
+        message:       `${req.user.name}'s appointment on ${appointment.date} at ${appointment.time} has been confirmed with payment.`,
+        appointmentId: appointment._id.toString(),
+      });
+    }
+
+    // Activity log
+    ActivityLogService.log({
+      userId:      req.user._id,
+      role:        'patient',
+      action:      'payment_completed',
+      description: `${req.user.name} completed payment for appointment with Dr. ${doctorName} on ${appointment.date}.`,
+    });
+
     res.json(updated);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -224,14 +285,82 @@ export const getDoctorAppointments = async (req, res) => {
 export const updateAppointmentStatus = async (req, res) => {
   try {
     const { status } = req.body;
-    const appointment = await Appointment.findById(req.params.id);
+
+    const appointment = await Appointment.findById(req.params.id)
+      .populate('userId', 'name')
+      .populate({ path: 'doctorId', populate: { path: 'userId', select: 'name' } });
 
     if (!appointment) {
       return res.status(404).json({ message: 'Appointment not found' });
     }
 
+    const previousStatus = appointment.status;
     appointment.status = status;
     const updatedAppointment = await appointment.save();
+
+    // ── NEW: Emit notifications based on new status ────────────────────────
+    const patientId    = appointment.userId?._id?.toString();
+    const patientName  = appointment.userId?.name || 'the patient';
+    const doctorUserId = appointment.doctorId?.userId?._id?.toString();
+    const doctorName   = appointment.doctorId?.userId?.name || 'the doctor';
+
+    if (status === 'confirmed' && previousStatus !== 'confirmed') {
+      // Patient learns their appointment is confirmed
+      if (patientId) {
+        NotificationService.send({
+          recipientId:   patientId,
+          recipientRole: 'patient',
+          senderId:      req.user._id.toString(),
+          type:          'appointment_confirmed',
+          title:         'Appointment Confirmed',
+          message:       `Your appointment with Dr. ${doctorName} on ${appointment.date} at ${appointment.time} has been confirmed.`,
+          appointmentId: appointment._id.toString(),
+        });
+      }
+
+      // Activity log
+      ActivityLogService.log({
+        userId:      req.user._id,
+        role:        req.user.role,
+        action:      'appointment_confirmed',
+        description: `Appointment for ${patientName} with Dr. ${doctorName} on ${appointment.date} was confirmed.`,
+      });
+
+    } else if (status === 'cancelled' && previousStatus !== 'cancelled') {
+      // Patient receives cancellation notice
+      if (patientId) {
+        NotificationService.send({
+          recipientId:   patientId,
+          recipientRole: 'patient',
+          senderId:      req.user._id.toString(),
+          type:          'appointment_cancelled',
+          title:         'Appointment Cancelled',
+          message:       `Your appointment with Dr. ${doctorName} on ${appointment.date} at ${appointment.time} has been cancelled.`,
+          appointmentId: appointment._id.toString(),
+        });
+      }
+
+      // Doctor receives cancellation notice (if patient cancelled)
+      if (doctorUserId && req.user.role === 'patient') {
+        NotificationService.send({
+          recipientId:   doctorUserId,
+          recipientRole: 'doctor',
+          senderId:      req.user._id.toString(),
+          type:          'appointment_cancelled',
+          title:         'Appointment Cancelled by Patient',
+          message:       `${patientName}'s appointment on ${appointment.date} at ${appointment.time} has been cancelled.`,
+          appointmentId: appointment._id.toString(),
+        });
+      }
+
+      // Activity log
+      ActivityLogService.log({
+        userId:      req.user._id,
+        role:        req.user.role,
+        action:      'appointment_cancelled',
+        description: `Appointment for ${patientName} with Dr. ${doctorName} on ${appointment.date} was cancelled.`,
+      });
+    }
 
     res.json(updatedAppointment);
   } catch (error) {

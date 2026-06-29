@@ -11,6 +11,8 @@ import AdminDashboard from './pages/AdminDashboard';
 import PendingVerification from './pages/PendingVerification';
 import PaymentPage from './pages/PaymentPage';
 import ProtectedRoute from './components/ProtectedRoute';
+// NEW: Notifications page
+import NotificationsPage from './pages/NotificationsPage';
 
 function App() {
   return (
@@ -67,6 +69,16 @@ function App() {
               element={
                 <ProtectedRoute allowedRoles={['admin']}>
                   <AdminDashboard />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* NEW: Notifications — accessible by all authenticated roles */}
+            <Route
+              path="/notifications"
+              element={
+                <ProtectedRoute allowedRoles={['patient', 'doctor', 'admin']}>
+                  <NotificationsPage />
                 </ProtectedRoute>
               }
             />
