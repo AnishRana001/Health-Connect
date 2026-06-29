@@ -40,7 +40,9 @@ const showNotificationToast = (notification) => {
   });
 };
 
-const SOCKET_URL = 'http://localhost:5000';   // same host as the backend
+// Uses VITE_API_URL env variable in production (set on Vercel).
+// Falls back to localhost for local development.
+const SOCKET_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 export const SocketProvider = ({ children }) => {
   const { user } = useAuth();
