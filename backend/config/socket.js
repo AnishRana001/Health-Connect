@@ -13,10 +13,16 @@ let io;
  * @returns {import('socket.io').Server}       The initialised io instance
  */
 export const initSocket = (httpServer) => {
+  const clientOrigin = process.env.CLIENT_URL || 'http://localhost:5173';
+  const allowedOrigins = [
+    clientOrigin,
+    clientOrigin.endsWith('/') ? clientOrigin.slice(0, -1) : `${clientOrigin}/`
+  ];
+
   io = new Server(httpServer, {
     // Allow the Vite dev server (and production origin) to connect
     cors: {
-      origin: process.env.CLIENT_URL || 'http://localhost:5173',
+      origin: allowedOrigins,
       methods: ['GET', 'POST'],
       credentials: true,
     },

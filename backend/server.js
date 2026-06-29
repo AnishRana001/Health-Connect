@@ -44,8 +44,14 @@ connectDB();
 const app = express();
 
 // Middleware
+const clientOrigin = process.env.CLIENT_URL || 'http://localhost:5173';
+const allowedOrigins = [
+  clientOrigin,
+  clientOrigin.endsWith('/') ? clientOrigin.slice(0, -1) : `${clientOrigin}/`
+];
+
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  origin: allowedOrigins,
   credentials: true,
 }));
 app.use(express.json());
